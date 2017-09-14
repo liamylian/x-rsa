@@ -76,12 +76,12 @@ func TestCrossLanguage(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	crsa, err := NewXRsa(pubKey, priKey)
+	rsa2, err := NewXRsa(pubKey, priKey)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
 
-	decrypted, err := crsa.PrivateDecrypt(data["encrypted"])
+	decrypted, err := rsa2.PrivateDecrypt(data["encrypted"])
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -89,7 +89,7 @@ func TestCrossLanguage(t *testing.T) {
 		t.Fatal(fmt.Sprintf("Faild assert \"%s\" equals \"%s\"", decrypted, data))
 	}
 
-	err = crsa.VerifySign(data["data"], data["sign"])
+	err = rsa2.VerifySign(data["data"], data["sign"])
 	if err != nil {
 		t.Fatal(err.Error())
 	}

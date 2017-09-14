@@ -20,7 +20,7 @@ public class XRsaTest extends TestCase
     public void testEncryptDecrypt()
     {
         Map<String, String> keys = XRsa.createKeys(2048);
-        XRsa rsa = new XRsa(keys.get("publicKey"), keys.get("privateKey"), 2048);
+        XRsa rsa = new XRsa(keys.get("publicKey"), keys.get("privateKey"));
         String data = "hello world";
 
         String encrypted = rsa.publicEncrypt(data);
@@ -32,7 +32,7 @@ public class XRsaTest extends TestCase
     public void testSign()
     {
         Map<String, String> keys = XRsa.createKeys(2048);
-        XRsa rsa = new XRsa(keys.get("publicKey"), keys.get("privateKey"), 2048);
+        XRsa rsa = new XRsa(keys.get("publicKey"), keys.get("privateKey"));
         String data = "hello world";
 
         String sign = rsa.privateSign(data);

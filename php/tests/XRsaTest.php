@@ -40,14 +40,14 @@ class XRsaTest extends TestCase
         $sign = $rsa->privateSign($data);
         $is_valid = $rsa->verifySign($data, $sign);
 
-        $this->assertTrue($is_valid);
+        $this->assertEquals(1, $is_valid);
     }
 
     public function test_cross_language()
     {
+        $publicKey = file_get_contents(__DIR__. "/../../test/pub.pem");
+        $privateKey = file_get_contents(__DIR__. "/../../test/pri.pem");
         $testData = json_decode(file_get_contents(__DIR__. "/../../test/java.json"), true);
-        $publicKey = Pem::base64ToPem(url_safe_base64_to_base64($testData['publicKey']), true);
-        $privateKey = Pem::base64ToPem(url_safe_base64_to_base64($testData['privateKey']), false);
         $data = $testData['data'];
         $encrypted = $testData['encrypted'];
         $sign = $testData['sign'];

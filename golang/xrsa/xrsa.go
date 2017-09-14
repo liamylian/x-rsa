@@ -15,9 +15,9 @@ import (
 
 const (
 	CHAR_SET = "UTF-8"
-	ALGORITHM_RSA = "PKCS8"
 	BASE_64_FORMAT = "UrlSafeNoPadding"
-	ALGORITHM_RSA_SIGN = crypto.SHA256
+	RSA_ALGORITHM_KEY_TYPE = "PKCS8"
+	RSA_ALGORITHM_SIGN = crypto.SHA256
 )
 
 type XRsa struct {
@@ -124,11 +124,11 @@ func (r *XRsa) PrivateDecrypt(encrypted string) (string, error) {
 }
 
 func (r *XRsa) PrivateSign(data string) (string, error) {
-	h := ALGORITHM_RSA_SIGN.New()
+	h := RSA_ALGORITHM_SIGN.New()
 	h.Write([]byte(data))
 	hashed := h.Sum(nil)
 
-	sign, err := rsa.SignPKCS1v15(rand.Reader, r.privateKey, ALGORITHM_RSA_SIGN, hashed)
+	sign, err := rsa.SignPKCS1v15(rand.Reader, r.privateKey, RSA_ALGORITHM_SIGN, hashed)
 	if err != nil {
 		return "", err
 	}
@@ -136,7 +136,7 @@ func (r *XRsa) PrivateSign(data string) (string, error) {
 }
 
 func (r *XRsa) VerifySign(data string, sign string) error {
-	h := ALGORITHM_RSA_SIGN.New()
+	h := RSA_ALGORITHM_SIGN.New()
 	h.Write([]byte(data))
 	hashed := h.Sum(nil)
 
@@ -145,7 +145,7 @@ func (r *XRsa) VerifySign(data string, sign string) error {
 		return err
 	}
 
-	return rsa.VerifyPKCS1v15(r.publicKey, ALGORITHM_RSA_SIGN, hashed, decodedSign)
+	return rsa.VerifyPKCS1v15(r.publicKey, RSA_ALGORITHM_SIGN, hashed, decodedSign)
 }
 
 func MarshalPKCS8PrivateKey(key *rsa.PrivateKey) []byte {
