@@ -15,7 +15,8 @@ import (
 
 const (
 	CHAR_SET = "UTF-8"
-	ALGORITHM_RSA = "RSA"
+	ALGORITHM_RSA = "PKCS8"
+	BASE_64_FORMAT = "UrlSafeNoPadding"
 	ALGORITHM_RSA_SIGN = crypto.SHA256
 )
 
@@ -102,12 +103,12 @@ func (r *XRsa) PublicEncrypt(data string) (string, error) {
 		buffer.Write(bytes)
 	}
 
-	return base64.URLEncoding.EncodeToString(buffer.Bytes()), nil
+	return base64.RawURLEncoding.EncodeToString(buffer.Bytes()), nil
 }
 
 func (r *XRsa) PrivateDecrypt(encrypted string) (string, error) {
 	partLen := r.publicKey.N.BitLen() / 8
-	raw, err := base64.URLEncoding.DecodeString(encrypted)
+	raw, err := base64.RawURLEncoding.DecodeString(encrypted)
 	chunks := split([]byte(raw), partLen)
 
 	buffer := bytes.NewBufferString("")
@@ -131,7 +132,7 @@ func (r *XRsa) PrivateSign(data string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return base64.URLEncoding.EncodeToString(sign), err
+	return base64.RawURLEncoding.EncodeToString(sign), err
 }
 
 func (r *XRsa) VerifySign(data string, sign string) error {
@@ -139,7 +140,7 @@ func (r *XRsa) VerifySign(data string, sign string) error {
 	h.Write([]byte(data))
 	hashed := h.Sum(nil)
 
-	decodedSign, err := base64.URLEncoding.DecodeString(sign)
+	decodedSign, err := base64.RawURLEncoding.DecodeString(sign)
 	if err != nil {
 		return err
 	}
