@@ -19,7 +19,7 @@ class Pem
         }
     }
 
-    public static function PemToBase64($pem)
+    public static function pemToBase64($pem)
     {
         $parts = explode("\n", $pem);
         unset($parts[count($parts) - 1]);

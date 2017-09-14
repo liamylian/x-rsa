@@ -1,22 +1,27 @@
 <?php
 
 use XRsa\XRsa;
+use XRsa\Pem;
 use PHPUnit\Framework\TestCase;
 
 class XRsaTest extends TestCase
 {
-    private $public_key;
-
-    private $private_key;
-
-    public function setUp()
+    public function test_create_keys()
     {
-        list($this->public_key, $this->private_key) = XRsa::createKeys(2048);
+        $keys = XRsa::createKeys(2048);
+        $this->assertNotNull($keys['publicKey']);
+        $this->assertNotNull($keys['privateKey']);
+
+        return $keys;
     }
 
-    public function test_encrypt_decrypt()
+    /**
+     * @depends test_create_keys
+     * @param $keys
+     */
+    public function test_encrypt_decrypt($keys)
     {
-        $rsa = new XRsa($this->public_key, $this->private_key);
+        $rsa = new XRsa($keys['publicKey'], $keys['privateKey']);
         $data = "Hello, World";
         $encrypted = $rsa->publicEncrypt($data);
         $decrypted = $rsa->privateDecrypt($encrypted);
@@ -24,13 +29,35 @@ class XRsaTest extends TestCase
         $this->assertEquals($data, $decrypted);
     }
 
-    public function test_sign()
+    /**
+     * @depends test_create_keys
+     * @param $keys
+     */
+    public function test_sign($keys)
     {
-        $rsa = new XRsa($this->public_key, $this->private_key);
+        $rsa = new XRsa($keys['publicKey'], $keys['privateKey']);
         $data = "Hello, World";
         $sign = $rsa->privateSign($data);
         $is_valid = $rsa->verifySign($data, $sign);
 
         $this->assertTrue($is_valid);
     }
+
+    public function test_cross_language()
+    {
+        $testData = json_decode(file_get_contents(__DIR__. "/../../test/java.json"), true);
+        $publicKey = Pem::base64ToPem(url_safe_base64_to_base64($testData['publicKey']), true);
+        $privateKey = Pem::base64ToPem(url_safe_base64_to_base64($testData['privateKey']), false);
+        $data = $testData['data'];
+        $encrypted = $testData['encrypted'];
+        $sign = $testData['sign'];
+
+        $rsa = new XRsa($publicKey, $privateKey);
+        $decrypted = $rsa->privateDecrypt($encrypted);
+        $verify = $rsa->verifySign($data, $sign);
+
+        $this->assertEquals($data, $decrypted);
+        $this->assertEquals(1, $verify);
+    }
+
 }
