@@ -10,6 +10,7 @@ import (
 	"crypto"
 	"io"
 	"bytes"
+	"encoding/asn1"
 )
 
 const (
@@ -23,13 +24,13 @@ type XRsa struct {
 	privateKey *rsa.PrivateKey
 }
 
-func createKeys(publicKeyWriter, privateKeyWriter io.Writer, keyLength int) error {
+func CreateKeys(publicKeyWriter, privateKeyWriter io.Writer, keyLength int) error {
 	// 生成私钥文件
 	privateKey, err := rsa.GenerateKey(rand.Reader, keyLength)
 	if err != nil {
 		return err
 	}
-	derStream := x509.MarshalPKCS1PrivateKey(privateKey)
+	derStream := MarshalPKCS8PrivateKey(privateKey)
 	block := &pem.Block{
 		Type:  "PRIVATE KEY",
 		Bytes: derStream,
@@ -72,18 +73,23 @@ func NewXRsa(publicKey []byte, privateKey []byte) (*XRsa, error) {
 	if block == nil {
 		return nil, errors.New("private key error!")
 	}
-	priv, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	priv, err := x509.ParsePKCS8PrivateKey(block.Bytes)
 	if err != nil {
 		return nil, err
 	}
 
-	return &XRsa {
-		publicKey: pub,
-		privateKey: priv,
-	}, nil
+	pri, ok := priv.(*rsa.PrivateKey)
+	if ok {
+		return &XRsa {
+			publicKey: pub,
+			privateKey: pri,
+		}, nil
+	} else {
+		return nil, errors.New("private key not supported")
+	}
 }
 
-func (r *XRsa) publicEncrypt(data string) (string, error) {
+func (r *XRsa) PublicEncrypt(data string) (string, error) {
 	partLen := r.publicKey.N.BitLen() / 8 - 11
 	chunks := split([]byte(data), partLen)
 
@@ -99,7 +105,7 @@ func (r *XRsa) publicEncrypt(data string) (string, error) {
 	return base64.URLEncoding.EncodeToString(buffer.Bytes()), nil
 }
 
-func (r *XRsa) privateDecrypt(encrypted string) (string, error) {
+func (r *XRsa) PrivateDecrypt(encrypted string) (string, error) {
 	partLen := r.publicKey.N.BitLen() / 8
 	raw, err := base64.URLEncoding.DecodeString(encrypted)
 	chunks := split([]byte(raw), partLen)
@@ -116,7 +122,7 @@ func (r *XRsa) privateDecrypt(encrypted string) (string, error) {
 	return buffer.String(), err
 }
 
-func (r *XRsa) privateSign(data string) (string, error) {
+func (r *XRsa) PrivateSign(data string) (string, error) {
 	h := ALGORITHM_RSA_SIGN.New()
 	h.Write([]byte(data))
 	hashed := h.Sum(nil)
@@ -128,7 +134,7 @@ func (r *XRsa) privateSign(data string) (string, error) {
 	return base64.URLEncoding.EncodeToString(sign), err
 }
 
-func (r *XRsa) verifySign(data string, sign string) error {
+func (r *XRsa) VerifySign(data string, sign string) error {
 	h := ALGORITHM_RSA_SIGN.New()
 	h.Write([]byte(data))
 	hashed := h.Sum(nil)
@@ -139,4 +145,19 @@ func (r *XRsa) verifySign(data string, sign string) error {
 	}
 
 	return rsa.VerifyPKCS1v15(r.publicKey, ALGORITHM_RSA_SIGN, hashed, decodedSign)
+}
+
+func MarshalPKCS8PrivateKey(key *rsa.PrivateKey) []byte {
+	info := struct {
+		Version             int
+		PrivateKeyAlgorithm []asn1.ObjectIdentifier
+		PrivateKey          []byte
+	}{}
+	info.Version = 0
+	info.PrivateKeyAlgorithm = make([]asn1.ObjectIdentifier, 1)
+	info.PrivateKeyAlgorithm[0] = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 1, 1}
+	info.PrivateKey = x509.MarshalPKCS1PrivateKey(key)
+
+	k, _ := asn1.Marshal(info)
+	return k
 }
