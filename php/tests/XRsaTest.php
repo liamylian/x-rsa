@@ -47,7 +47,7 @@ class XRsaTest extends TestCase
     {
         $publicKey = file_get_contents(__DIR__. "/../../test/pub.pem");
         $privateKey = file_get_contents(__DIR__. "/../../test/pri.pem");
-        $testData = json_decode(file_get_contents(__DIR__. "/../../test/java.json"), true);
+        $testData = json_decode(file_get_contents(__DIR__. "/../../test/data.json"), true);
         $data = $testData['data'];
         $encrypted = $testData['encrypted'];
         $sign = $testData['sign'];

@@ -67,7 +67,7 @@ func TestCrossLanguage(t *testing.T) {
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	testData, err := ioutil.ReadFile("../../test/java.json")
+	testData, err := ioutil.ReadFile("../../test/data.json")
 	if err != nil {
 		t.Fatal(err.Error())
 	}
