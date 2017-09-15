@@ -46,12 +46,12 @@ func TestEncryptDecrypt(t *testing.T) {
 
 func TestSignVerify(t *testing.T) {
 	data := "Hello, World"
-	sign, err := xrsa.PrivateSign(data)
+	sign, err := xrsa.Sign(data)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
 
-	err = xrsa.VerifySign(data, sign)
+	err = xrsa.Verify(data, sign)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -89,7 +89,7 @@ func TestCrossLanguage(t *testing.T) {
 		t.Fatal(fmt.Sprintf("Faild assert \"%s\" equals \"%s\"", decrypted, data))
 	}
 
-	err = rsa2.VerifySign(data["data"], data["sign"])
+	err = rsa2.Verify(data["data"], data["sign"])
 	if err != nil {
 		t.Fatal(err.Error())
 	}

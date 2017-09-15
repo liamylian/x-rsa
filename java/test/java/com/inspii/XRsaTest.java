@@ -18,7 +18,7 @@ public class XRsaTest extends TestCase {
         return new TestSuite(XRsaTest.class);
     }
 
-    public void testEncryptDecrypt() {
+    public void testPublicEncryptPrivateDecrypt() {
         Map<String, String> keys = XRsa.createKeys(2048);
         XRsa rsa = new XRsa(keys.get("publicKey"), keys.get("privateKey"));
         String data = "hello world";
@@ -28,20 +28,30 @@ public class XRsaTest extends TestCase {
         assertEquals(data, decrypted);
     }
 
+    public void testPrivateEncryptPublicDecrypt() {
+        Map<String, String> keys = XRsa.createKeys(2048);
+        XRsa rsa = new XRsa(keys.get("publicKey"), keys.get("privateKey"));
+        String data = "hello world";
+
+        String encrypted = rsa.privateEncrypt(data);
+        String decrypted = rsa.publicDecrypt(encrypted);
+        assertEquals(data, decrypted);
+    }
+
     public void testSign() {
         Map<String, String> keys = XRsa.createKeys(2048);
         XRsa rsa = new XRsa(keys.get("publicKey"), keys.get("privateKey"));
         String data = "hello world";
 
-        String sign = rsa.privateSign(data);
-        Boolean isValid = rsa.verifySign(data, sign);
+        String sign = rsa.sign(data);
+        Boolean isValid = rsa.verify(data, sign);
         assertTrue(isValid);
     }
 
     public void testCrossPlatform() {
         File pubFile = new File("pub.base64cert");
         File priFile = new File("pri.base64cert");
-        File testFile = new File("data.json");
+        File testFile = new File("java.json");
         String pubKey = readFile(pubFile);
         String priKey = readFile(priFile);
         String dataStr = readFile(testFile);
@@ -51,8 +61,8 @@ public class XRsaTest extends TestCase {
         String decrypted = rsa.privateDecrypt(data.get("encrypted"));
         assertEquals(data.get("data"), decrypted);
 
-        String sign = rsa.privateSign(data.get("data"));
-        Boolean isValid = rsa.verifySign(data.get("data"), sign);
+        String sign = rsa.sign(data.get("data"));
+        Boolean isValid = rsa.verify(data.get("data"), sign);
         assertTrue(isValid);
     }
 

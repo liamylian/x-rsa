@@ -16,11 +16,15 @@ class XRsa
 
     protected $public_key;
     protected $private_key;
+    protected $key_len;
 
     public function __construct($pub_key, $pri_key = null)
     {
         $this->public_key = $pub_key;
         $this->private_key = $pri_key;
+
+        $pub_id = openssl_get_publickey($this->public_key);
+        $this->key_len = openssl_pkey_get_details($pub_id)['bits'];
     }
 
     public static function createKeys($key_size = 2048)
@@ -43,14 +47,12 @@ class XRsa
     public function publicEncrypt($data)
     {
         $encrypted = '';
-        $pub_id = openssl_get_publickey($this->public_key);
-        $key_len = openssl_pkey_get_details($pub_id)['bits'];
-        $part_len = $key_len / 8 - 11;
+        $part_len = $this->key_len / 8 - 11;
         $parts = str_split($data, $part_len);
 
         foreach ($parts as $part) {
             $encrypted_temp = '';
-            openssl_public_encrypt($part, $encrypted_temp, $this->public_key);//公钥加密
+            openssl_public_encrypt($part, $encrypted_temp, $this->public_key);
             $encrypted .= $encrypted_temp;
         }
 
@@ -60,28 +62,56 @@ class XRsa
     public function privateDecrypt($encrypted)
     {
         $decrypted = "";
-        $pub_id = openssl_get_publickey($this->public_key);
-        $key_len = openssl_pkey_get_details($pub_id)['bits'];
-        $part_len = $key_len / 8;
+        $part_len = $this->key_len / 8;
         $base64_decoded = url_safe_base64_decode($encrypted);
         $parts = str_split($base64_decoded, $part_len);
 
         foreach ($parts as $part) {
             $decrypted_temp = '';
-            openssl_private_decrypt($part, $decrypted_temp,$this->private_key);//私钥解密
+            openssl_private_decrypt($part, $decrypted_temp,$this->private_key);
             $decrypted .= $decrypted_temp;
         }
         return $decrypted;
     }
 
-    public function privateSign($data)
+    public function privateEncrypt($data)
+    {
+        $encrypted = '';
+        $part_len = $this->key_len / 8 - 11;
+        $parts = str_split($data, $part_len);
+
+        foreach ($parts as $part) {
+            $encrypted_temp = '';
+            openssl_private_encrypt($part, $encrypted_temp, $this->private_key);
+            $encrypted .= $encrypted_temp;
+        }
+
+        return url_safe_base64_encode($encrypted);
+    }
+
+    public function publicDecrypt($encrypted)
+    {
+        $decrypted = "";
+        $part_len = $this->key_len / 8;
+        $base64_decoded = url_safe_base64_decode($encrypted);
+        $parts = str_split($base64_decoded, $part_len);
+
+        foreach ($parts as $part) {
+            $decrypted_temp = '';
+            openssl_public_decrypt($part, $decrypted_temp,$this->public_key);
+            $decrypted .= $decrypted_temp;
+        }
+        return $decrypted;
+    }
+
+    public function sign($data)
     {
         openssl_sign($data, $sign, $this->private_key, self::RSA_ALGORITHM_SIGN);
 
         return url_safe_base64_encode($sign);
     }
 
-    public function verifySign($data, $sign)
+    public function verify($data, $sign)
     {
         $pub_id = openssl_get_publickey($this->public_key);
         $res = openssl_verify($data, url_safe_base64_decode($sign), $pub_id, self::RSA_ALGORITHM_SIGN);

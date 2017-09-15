@@ -26,8 +26,8 @@ OpenSSL RSA Encryption, Decryption, and Key Generation. Java, Php GoLang Support
     $data = "Hello, World";
     $encrypted = $rsa->publicEncrypt($data);
     $decrypted = $rsa->privateDecrypt($encrypted);
-    $sign = $rsa->privateSign($data);
-    $is_valid = $rsa->verifySign($data, $sign);
+    $sign = $rsa->sign($data);
+    $is_valid = $rsa->verify($data, $sign);
 ```
 ### GoLang
 ```golang
@@ -47,8 +47,8 @@ OpenSSL RSA Encryption, Decryption, and Key Generation. Java, Php GoLang Support
     data := "Hello, World"
     encrypted, _ := xrsa.PublicEncrypt(data)
     decrypted, _ := xrsa.PrivateDecrypt(encrypted)
-    $sign = $rsa->privateSign($data);
-    $is_valid = $rsa->verifySign($data, $sign);
+    $sign = $rsa->Sign(data);
+    $is_valid = $rsa->Verify(data, sign);
 ```
     
 ### Java
@@ -59,6 +59,6 @@ OpenSSL RSA Encryption, Decryption, and Key Generation. Java, Php GoLang Support
     String data = "hello world";
     String encrypted = rsa.publicEncrypt(data);
     String decrypted = rsa.privateDecrypt(encrypted);
-    String sign = rsa.privateSign(data);
-    Boolean isValid = rsa.verifySign(data, sign);
+    String sign = rsa.sign(data);
+    Boolean isValid = rsa.verify(data, sign);
 ```

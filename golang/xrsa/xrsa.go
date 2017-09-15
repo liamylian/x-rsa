@@ -123,7 +123,7 @@ func (r *XRsa) PrivateDecrypt(encrypted string) (string, error) {
 	return buffer.String(), err
 }
 
-func (r *XRsa) PrivateSign(data string) (string, error) {
+func (r *XRsa) Sign(data string) (string, error) {
 	h := RSA_ALGORITHM_SIGN.New()
 	h.Write([]byte(data))
 	hashed := h.Sum(nil)
@@ -135,7 +135,7 @@ func (r *XRsa) PrivateSign(data string) (string, error) {
 	return base64.RawURLEncoding.EncodeToString(sign), err
 }
 
-func (r *XRsa) VerifySign(data string, sign string) error {
+func (r *XRsa) Verify(data string, sign string) error {
 	h := RSA_ALGORITHM_SIGN.New()
 	h.Write([]byte(data))
 	hashed := h.Sum(nil)
