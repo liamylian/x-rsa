@@ -1,5 +1,5 @@
-# x-rsa
-OpenSSL RSA Encryption, Decryption, and Key Generation. Java, Php GoLang Supported, Large Data Support.
+# XRSA
+OpenSSL RSA Encryption, Decryption, and Key Generation. Java, Php GoLang Support, Large Data Support.
 
 ## Installation
 
@@ -37,23 +37,16 @@ OpenSSL RSA Encryption, Decryption, and Key Generation. Java, Php GoLang Support
 
     err := CreateKeys(publicKey, privateKey, 2048)
     if err != nil {
-        t.Error(err.Error())
+        return
     }
     xrsa, err = NewXRsa(publicKey.Bytes(), privateKey.Bytes())
     if err != nil {
-        t.Error(err.Error())
+        return
     }
 
     data := "Hello, World"
-    encrypted, err := xrsa.PublicEncrypt(data)
-    if err != nil {
-        t.Fatal(err.Error())
-    }
-    decrypted, err := xrsa.PrivateDecrypt(encrypted)
-    if err != nil {
-        t.Fatal(err.Error())
-    }
-
+    encrypted, _ := xrsa.PublicEncrypt(data)
+    decrypted, _ := xrsa.PrivateDecrypt(encrypted)
     $sign = $rsa->privateSign($data);
     $is_valid = $rsa->verifySign($data, $sign);
 ```
