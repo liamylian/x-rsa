@@ -1,7 +1,5 @@
 <?php
 
-namespace XRsa;
-
 /**
  * @author williamylian
  *

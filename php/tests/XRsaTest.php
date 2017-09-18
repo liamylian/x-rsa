@@ -1,21 +1,17 @@
 <?php
 
 use XRsa\XRsa;
-use XRsa\Pem;
 use PHPUnit\Framework\TestCase;
 
 class XRsaTest extends TestCase
 {
     public function test_create_keys()
     {
-        //$keys = XRsa::createKeys(2048);
-        //$this->assertNotNull($keys['publicKey']);
-        //$this->assertNotNull($keys['privateKey']);
+        $keys = XRsa::createKeys(2048);
+        $this->assertNotNull($keys['publicKey']);
+        $this->assertNotNull($keys['privateKey']);
 
-        //return $keys;
-        $publicKey = file_get_contents(__DIR__. "/../../test/pub.pem");
-        $privateKey = file_get_contents(__DIR__. "/../../test/pri.pem");
-        return ['publicKey'=>$publicKey, 'privateKey'=>$privateKey];
+        return $keys;
     }
 
     /**
