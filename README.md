@@ -4,17 +4,19 @@ OpenSSL RSA Encryption, Decryption, and Key Generation. Java, Php GoLang Support
 ## Installation
 
 ### Php
+Just copy `php/src/XRsa.php` and `php/src/helpers.php` to your project. Alternatively, you can use composer to install:
 ```cmd
-    composer require williamylian/x-rsa
+composer require liamylian/x-rsa
 ```
 
 ### GoLang
+Just Copy `golang/xrsa/xrsa.go` to your project, or use command:
 ```cmd
-    go get github.com/williamylian/x-rsa
+go get github.com/liamylian/x-rsa
 ```
 
 ### Java
-    Just Copy XRsa.java to your project
+Just Copy `XRsa.java` to your project
 
 ## Usage
 

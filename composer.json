@@ -1,9 +1,9 @@
 {
-    "name": "williamylian/x-rsa",
+    "name": "liamylian/x-rsa",
     "type": "library",
     "description": "Cross programming language Rsa",
     "keywords": ["rsa","cross language"],
-    "homepage": "https://github.com/williamylian/x-rsa",
+    "homepage": "https://github.com/liamylian/x-rsa",
     "license": "GNU 3.0",
     "require": {
         "php": ">=5.6.4"
@@ -13,8 +13,8 @@
     },
     "authors": [
         {
-            "name": "William Y. Lian",
-            "email": "inspii@qq.com",
+            "name": "Liam Y. Lian",
+            "email": "inspii@me.com",
             "homepage": "http://www.inspii.com",
             "role": "Developer"
         }
