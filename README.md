@@ -4,14 +4,14 @@ OpenSSL RSA Encryption, Decryption, and Key Generation. Java, Php GoLang Support
 ## Installation
 
 ### Php
-*Make sure `openssl` extension is enabled*
+*Make sure `openssl` extension is enabled*.
 Just copy `php/src/XRsa.php` and `php/src/helpers.php` to your project. Alternatively, you can use composer to install:
 ```cmd
 composer require liamylian/x-rsa
 ```
 
 ### GoLang
-*Make sure your golang version is greater than `1.10.3`*
+*Make sure your golang version is greater than `1.10.3`*.
 Just Copy `golang/xrsa/xrsa.go` to your project, or use command:
 ```cmd
 go get github.com/liamylian/x-rsa
