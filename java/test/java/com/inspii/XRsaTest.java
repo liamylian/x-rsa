@@ -51,7 +51,7 @@ public class XRsaTest extends TestCase {
     public void testCrossPlatform() {
         File pubFile = new File("pub.base64cert");
         File priFile = new File("pri.base64cert");
-        File testFile = new File("java.json");
+        File testFile = new File("data.json");
         String pubKey = readFile(pubFile);
         String priKey = readFile(priFile);
         String dataStr = readFile(testFile);
@@ -59,6 +59,8 @@ public class XRsaTest extends TestCase {
 
         XRsa rsa = new XRsa(pubKey, priKey);
         String decrypted = rsa.privateDecrypt(data.get("encrypted"));
+        assertEquals(data.get("data"), decrypted);
+        decrypted = rsa.publicDecrypt(data.get("private_encrypted"));
         assertEquals(data.get("data"), decrypted);
 
         String sign = rsa.sign(data.get("data"));

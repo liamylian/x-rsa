@@ -63,13 +63,16 @@ class XRsaTest extends TestCase
         $testData = json_decode(file_get_contents(__DIR__. "/../../test/data.json"), true);
         $data = $testData['data'];
         $encrypted = $testData['encrypted'];
+        $private_encrypted = $testData['private_encrypted'];
         $sign = $testData['sign'];
 
         $rsa = new XRsa($publicKey, $privateKey);
         $decrypted = $rsa->privateDecrypt($encrypted);
+        $pub_decrypted = $rsa->publicDecrypt($private_encrypted);
         $verify = $rsa->verify($data, $sign);
 
         $this->assertEquals($data, $decrypted);
+        $this->assertEquals($data, $pub_decrypted);
         $this->assertEquals(1, $verify);
     }
 

@@ -125,6 +125,41 @@ func (r *XRsa) PrivateDecrypt(encrypted string) (string, error) {
 	return buffer.String(), err
 }
 
+func (r *XRsa) PrivateEncrypt(data string) (string, error) {
+	partLen := r.publicKey.N.BitLen() / 8 - 11
+	chunks := split([]byte(data), partLen)
+
+	buffer := bytes.NewBufferString("")
+	for _, chunk := range chunks {
+		bts, err := PrivateEncrypt(r.privateKey, chunk)
+		if err != nil {
+			return "", err
+		}
+
+		buffer.Write(bts)
+	}
+
+	return base64.RawURLEncoding.EncodeToString(buffer.Bytes()), nil
+}
+
+func (r *XRsa) PublicDecrypt(encrypted string) (string, error) {
+	partLen := r.publicKey.N.BitLen() / 8
+	raw, err := base64.RawURLEncoding.DecodeString(encrypted)
+	chunks := split([]byte(raw), partLen)
+
+	buffer := bytes.NewBufferString("")
+	for _, chunk := range chunks {
+		decrypted, err := PublicDecrypt(r.publicKey, chunk)
+
+		if err != nil {
+			return "", err
+		}
+		buffer.Write(decrypted)
+	}
+
+	return buffer.String(), err
+}
+
 func (r *XRsa) Sign(data string) (string, error) {
 	h := RSA_ALGORITHM_SIGN.New()
 	h.Write([]byte(data))
