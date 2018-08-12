@@ -10,7 +10,6 @@ import (
 	"crypto"
 	"io"
 	"bytes"
-	"encoding/asn1"
 )
 
 const (
@@ -31,7 +30,10 @@ func CreateKeys(publicKeyWriter, privateKeyWriter io.Writer, keyLength int) erro
 	if err != nil {
 		return err
 	}
-	derStream := MarshalPKCS8PrivateKey(privateKey)
+	derStream, err := x509.MarshalPKCS8PrivateKey(privateKey)
+	if err != nil {
+		return err
+	}
 	block := &pem.Block{
 		Type:  "PRIVATE KEY",
 		Bytes: derStream,
@@ -72,7 +74,7 @@ func NewXRsa(publicKey []byte, privateKey []byte) (*XRsa, error) {
 
 	block, _ = pem.Decode(privateKey)
 	if block == nil {
-		return nil, errors.New("private key error!")
+		return nil, errors.New("private key error")
 	}
 	priv, err := x509.ParsePKCS8PrivateKey(block.Bytes)
 	if err != nil {
@@ -96,11 +98,11 @@ func (r *XRsa) PublicEncrypt(data string) (string, error) {
 
 	buffer := bytes.NewBufferString("")
 	for _, chunk := range chunks {
-		bytes, err := rsa.EncryptPKCS1v15(rand.Reader, r.publicKey, chunk)
+		bts, err := rsa.EncryptPKCS1v15(rand.Reader, r.publicKey, chunk)
 		if err != nil {
 			return "", err
 		}
-		buffer.Write(bytes)
+		buffer.Write(bts)
 	}
 
 	return base64.RawURLEncoding.EncodeToString(buffer.Bytes()), nil
@@ -148,21 +150,6 @@ func (r *XRsa) Verify(data string, sign string) error {
 	return rsa.VerifyPKCS1v15(r.publicKey, RSA_ALGORITHM_SIGN, hashed, decodedSign)
 }
 
-func MarshalPKCS8PrivateKey(key *rsa.PrivateKey) []byte {
-	info := struct {
-		Version             int
-		PrivateKeyAlgorithm []asn1.ObjectIdentifier
-		PrivateKey          []byte
-	}{}
-	info.Version = 0
-	info.PrivateKeyAlgorithm = make([]asn1.ObjectIdentifier, 1)
-	info.PrivateKeyAlgorithm[0] = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 1, 1}
-	info.PrivateKey = x509.MarshalPKCS1PrivateKey(key)
-
-	k, _ := asn1.Marshal(info)
-	return k
-}
-
 func split(buf []byte, lim int) [][]byte {
 	var chunk []byte
 	chunks := make([][]byte, 0, len(buf)/lim+1)
@@ -171,7 +158,7 @@ func split(buf []byte, lim int) [][]byte {
 		chunks = append(chunks, chunk)
 	}
 	if len(buf) > 0 {
-		chunks = append(chunks, buf[:len(buf)])
+		chunks = append(chunks, buf[:])
 	}
 	return chunks
 }
