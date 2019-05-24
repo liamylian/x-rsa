@@ -1,31 +1,28 @@
 package xrsa
 
 import (
-	"encoding/pem"
-	"encoding/base64"
-	"crypto/x509"
-	"crypto/rsa"
-	"crypto/rand"
-	"errors"
-	"crypto"
-	"io"
 	"bytes"
+	"crypto"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/base64"
+	"encoding/pem"
+	"errors"
+	"io"
 )
 
 const (
-	CHAR_SET = "UTF-8"
-	BASE_64_FORMAT = "UrlSafeNoPadding"
-	RSA_ALGORITHM_KEY_TYPE = "PKCS8"
-	RSA_ALGORITHM_SIGN = crypto.SHA256
+	RsaSignAlgorithm = crypto.SHA256
+	// RsaPadding = PKCS#1
 )
 
 type XRsa struct {
-	publicKey *rsa.PublicKey
+	publicKey  *rsa.PublicKey
 	privateKey *rsa.PrivateKey
 }
 
 func CreateKeys(publicKeyWriter, privateKeyWriter io.Writer, keyLength int) error {
-	// 生成私钥文件
 	privateKey, err := rsa.GenerateKey(rand.Reader, keyLength)
 	if err != nil {
 		return err
@@ -43,7 +40,6 @@ func CreateKeys(publicKeyWriter, privateKeyWriter io.Writer, keyLength int) erro
 		return err
 	}
 
-	// 生成公钥文件
 	publicKey := &privateKey.PublicKey
 	derPkix, err := x509.MarshalPKIXPublicKey(publicKey)
 	if err != nil {
@@ -83,8 +79,8 @@ func NewXRsa(publicKey []byte, privateKey []byte) (*XRsa, error) {
 
 	pri, ok := priv.(*rsa.PrivateKey)
 	if ok {
-		return &XRsa {
-			publicKey: pub,
+		return &XRsa{
+			publicKey:  pub,
 			privateKey: pri,
 		}, nil
 	} else {
@@ -93,7 +89,9 @@ func NewXRsa(publicKey []byte, privateKey []byte) (*XRsa, error) {
 }
 
 func (r *XRsa) PublicEncrypt(data string) (string, error) {
-	partLen := r.publicKey.N.BitLen() / 8 - 11
+	// The message must be no longer than the
+	// length of the public modulus minus 11 bytes (taken by padding).
+	partLen := r.publicKey.N.BitLen()/8 - 11
 	chunks := split([]byte(data), partLen)
 
 	buffer := bytes.NewBufferString("")
@@ -126,7 +124,9 @@ func (r *XRsa) PrivateDecrypt(encrypted string) (string, error) {
 }
 
 func (r *XRsa) PrivateEncrypt(data string) (string, error) {
-	partLen := r.publicKey.N.BitLen() / 8 - 11
+	// The message must be no longer than the
+	// length of the public modulus minus 11 bytes (taken by padding).
+	partLen := r.publicKey.N.BitLen()/8 - 11
 	chunks := split([]byte(data), partLen)
 
 	buffer := bytes.NewBufferString("")
@@ -161,11 +161,11 @@ func (r *XRsa) PublicDecrypt(encrypted string) (string, error) {
 }
 
 func (r *XRsa) Sign(data string) (string, error) {
-	h := RSA_ALGORITHM_SIGN.New()
+	h := RsaSignAlgorithm.New()
 	h.Write([]byte(data))
 	hashed := h.Sum(nil)
 
-	sign, err := rsa.SignPKCS1v15(rand.Reader, r.privateKey, RSA_ALGORITHM_SIGN, hashed)
+	sign, err := rsa.SignPKCS1v15(rand.Reader, r.privateKey, RsaSignAlgorithm, hashed)
 	if err != nil {
 		return "", err
 	}
@@ -173,7 +173,7 @@ func (r *XRsa) Sign(data string) (string, error) {
 }
 
 func (r *XRsa) Verify(data string, sign string) error {
-	h := RSA_ALGORITHM_SIGN.New()
+	h := RsaSignAlgorithm.New()
 	h.Write([]byte(data))
 	hashed := h.Sum(nil)
 
@@ -182,7 +182,7 @@ func (r *XRsa) Verify(data string, sign string) error {
 		return err
 	}
 
-	return rsa.VerifyPKCS1v15(r.publicKey, RSA_ALGORITHM_SIGN, hashed, decodedSign)
+	return rsa.VerifyPKCS1v15(r.publicKey, RsaSignAlgorithm, hashed, decodedSign)
 }
 
 func split(buf []byte, lim int) [][]byte {

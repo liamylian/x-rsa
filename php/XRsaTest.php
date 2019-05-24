@@ -8,8 +8,8 @@ class XRsaTest extends TestCase
     public function test_create_keys()
     {
         $keys = XRsa::createKeys(2048);
-        $this->assertNotNull($keys['publicKey']);
-        $this->assertNotNull($keys['privateKey']);
+        $this->assertNotNull($keys['public_key']);
+        $this->assertNotNull($keys['private_key']);
 
         return $keys;
     }
@@ -20,7 +20,7 @@ class XRsaTest extends TestCase
      */
     public function test_public_encrypt_private_decrypt($keys)
     {
-        $rsa = new XRsa($keys['publicKey'], $keys['privateKey']);
+        $rsa = new XRsa($keys['public_key'], $keys['private_key']);
         $data = "Hello, World";
         $encrypted = $rsa->publicEncrypt($data);
         $decrypted = $rsa->privateDecrypt($encrypted);
@@ -34,7 +34,7 @@ class XRsaTest extends TestCase
      */
     public function test_private_encrypt_public_decrypt($keys)
     {
-        $rsa = new XRsa($keys['publicKey'], $keys['privateKey']);
+        $rsa = new XRsa($keys['public_key'], $keys['private_key']);
         $data = "Hello, World";
         $encrypted = $rsa->privateEncrypt($data);
         $decrypted = $rsa->publicDecrypt($encrypted);
@@ -48,7 +48,7 @@ class XRsaTest extends TestCase
      */
     public function test_sign($keys)
     {
-        $rsa = new XRsa($keys['publicKey'], $keys['privateKey']);
+        $rsa = new XRsa($keys['public_key'], $keys['private_key']);
         $data = "Hello, World";
         $sign = $rsa->sign($data);
         $is_valid = $rsa->verify($data, $sign);
@@ -58,9 +58,9 @@ class XRsaTest extends TestCase
 
     public function test_cross_language()
     {
-        $publicKey = file_get_contents(__DIR__. "/../../test/pub.pem");
-        $privateKey = file_get_contents(__DIR__. "/../../test/pri.pem");
-        $testData = json_decode(file_get_contents(__DIR__. "/../../test/data.json"), true);
+        $publicKey = file_get_contents(__DIR__ . "/../test/pub.pem");
+        $privateKey = file_get_contents(__DIR__ . "/../test/pri.pem");
+        $testData = json_decode(file_get_contents(__DIR__ . "/../test/data.json"), true);
         $data = $testData['data'];
         $encrypted = $testData['encrypted'];
         $private_encrypted = $testData['private_encrypted'];

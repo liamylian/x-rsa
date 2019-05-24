@@ -2,21 +2,14 @@
 
 namespace XRsa;
 
-/**
- * @author williamylian
- *
- * Class UrlSafeRsa
- */
 class XRsa
 {
-    const CHAR_SET = "UTF-8";
-    const BASE_64_FORMAT = "UrlSafeNoPadding";
-    const RSA_ALGORITHM_KEY_TYPE = OPENSSL_KEYTYPE_RSA;
     const RSA_ALGORITHM_SIGN = OPENSSL_ALGO_SHA256;
+    const RSA_PADDING = OPENSSL_PKCS1_PADDING;
 
-    protected $public_key;
-    protected $private_key;
-    protected $key_len;
+    private $public_key;
+    private $private_key;
+    private $key_len;
 
     public function __construct($pub_key, $pri_key = null)
     {
@@ -31,7 +24,7 @@ class XRsa
     {
         $config = array(
             "private_key_bits" => $key_size,
-            "private_key_type" => self::RSA_ALGORITHM_KEY_TYPE,
+            "private_key_type" => OPENSSL_KEYTYPE_RSA,
         );
         $res = openssl_pkey_new($config);
         openssl_pkey_export($res, $private_key);
@@ -46,13 +39,15 @@ class XRsa
 
     public function publicEncrypt($data)
     {
-        $encrypted = '';
+        // The message must be no longer than the
+        // length of the public modulus minus 11 bytes (taken by padding).
         $part_len = $this->key_len / 8 - 11;
         $parts = str_split($data, $part_len);
 
+        $encrypted = '';
         foreach ($parts as $part) {
             $encrypted_temp = '';
-            openssl_public_encrypt($part, $encrypted_temp, $this->public_key);
+            openssl_public_encrypt($part, $encrypted_temp, $this->public_key, self::RSA_PADDING);
             $encrypted .= $encrypted_temp;
         }
 
@@ -68,7 +63,7 @@ class XRsa
 
         foreach ($parts as $part) {
             $decrypted_temp = '';
-            openssl_private_decrypt($part, $decrypted_temp,$this->private_key);
+            openssl_private_decrypt($part, $decrypted_temp, $this->private_key, self::RSA_PADDING);
             $decrypted .= $decrypted_temp;
         }
         return $decrypted;
@@ -76,13 +71,15 @@ class XRsa
 
     public function privateEncrypt($data)
     {
-        $encrypted = '';
+        // The message must be no longer than the
+        // length of the public modulus minus 11 bytes (taken by padding).
         $part_len = $this->key_len / 8 - 11;
         $parts = str_split($data, $part_len);
 
+        $encrypted = '';
         foreach ($parts as $part) {
             $encrypted_temp = '';
-            openssl_private_encrypt($part, $encrypted_temp, $this->private_key);
+            openssl_private_encrypt($part, $encrypted_temp, $this->private_key, self::RSA_PADDING);
             $encrypted .= $encrypted_temp;
         }
 
@@ -98,7 +95,7 @@ class XRsa
 
         foreach ($parts as $part) {
             $decrypted_temp = '';
-            openssl_public_decrypt($part, $decrypted_temp,$this->public_key);
+            openssl_public_decrypt($part, $decrypted_temp, $this->public_key, self::RSA_PADDING);
             $decrypted .= $decrypted_temp;
         }
         return $decrypted;

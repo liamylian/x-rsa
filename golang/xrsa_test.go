@@ -1,15 +1,15 @@
 package xrsa
 
-import(
-	"testing"
+import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"encoding/json"
+	"testing"
 )
 
-var publicKey *bytes.Buffer = bytes.NewBufferString("")
-var privateKey *bytes.Buffer = bytes.NewBufferString("")
+var publicKey = bytes.NewBufferString("")
+var privateKey = bytes.NewBufferString("")
 var xrsa *XRsa
 
 func TestCreateKeys(t *testing.T) {
@@ -75,16 +75,16 @@ func TestSignVerify(t *testing.T) {
 }
 
 func TestCrossLanguage(t *testing.T) {
-	var data = make(map[string] string)
-	pubKey, err := ioutil.ReadFile("../../test/pub.pem")
+	var data = make(map[string]string)
+	pubKey, err := ioutil.ReadFile("../test/pub.pem")
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	priKey, err := ioutil.ReadFile("../../test/pri.pem")
+	priKey, err := ioutil.ReadFile("../test/pri.pem")
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	testData, err := ioutil.ReadFile("../../test/data.json")
+	testData, err := ioutil.ReadFile("../test/data.json")
 	if err != nil {
 		t.Fatal(err.Error())
 	}
