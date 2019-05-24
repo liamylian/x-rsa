@@ -51,8 +51,8 @@ Just Copy `XRsa.java` to your project
     data := "Hello, World"
     encrypted, _ := xrsa.PublicEncrypt(data)
     decrypted, _ := xrsa.PrivateDecrypt(encrypted)
-    $sign = $rsa->Sign(data);
-    $is_valid = $rsa->Verify(data, sign);
+    sign, err := xrsa.Sign(data)
+    err = xrsa.Verify(data, sign)
 ```
     
 ### Java
