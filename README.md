@@ -33,24 +33,24 @@ Just Copy `XRsa.java` to your project
     $sign = $rsa->sign($data);
     $is_valid = $rsa->verify($data, $sign);
 ```
+
 ### GoLang
 ```golang
-    var publicKey *bytes.Buffer = bytes.NewBufferString("")
-    var privateKey *bytes.Buffer = bytes.NewBufferString("")
-    var xrsa *XRsa
+    publicKey := bytes.NewBufferString("")
+    privateKey := bytes.NewBufferString("")
 
     err := CreateKeys(publicKey, privateKey, 2048)
     if err != nil {
         return
     }
-    xrsa, err = NewXRsa(publicKey.Bytes(), privateKey.Bytes())
+    xrsa, err := NewXRsa(publicKey.Bytes(), privateKey.Bytes())
     if err != nil {
         return
     }
 
     data := "Hello, World"
     encrypted, _ := xrsa.PublicEncrypt(data)
-    decrypted, _ := xrsa.PrivateDecrypt(encrypted)
+    decrypted, _ := xrsa.PrivateDecrypt(encrypted) 
     sign, err := xrsa.Sign(data)
     err = xrsa.Verify(data, sign)
 ```
