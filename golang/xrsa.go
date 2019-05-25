@@ -9,7 +9,6 @@ import (
 	"encoding/base64"
 	"encoding/pem"
 	"errors"
-	"io"
 )
 
 const (
@@ -22,43 +21,46 @@ type XRsa struct {
 	privateKey *rsa.PrivateKey
 }
 
-func CreateKeys(publicKeyWriter, privateKeyWriter io.Writer, keyLength int) error {
-	privateKey, err := rsa.GenerateKey(rand.Reader, keyLength)
+func CreateKeys(keyLength int) (publicKey, privateKey string, err error) {
+	priKey, err := rsa.GenerateKey(rand.Reader, keyLength)
 	if err != nil {
-		return err
+		return
 	}
-	derStream, err := x509.MarshalPKCS8PrivateKey(privateKey)
+	derStream, err := x509.MarshalPKCS8PrivateKey(priKey)
 	if err != nil {
-		return err
+		return
 	}
 	block := &pem.Block{
 		Type:  "PRIVATE KEY",
 		Bytes: derStream,
 	}
-	err = pem.Encode(privateKeyWriter, block)
+
+	privateKeyBuf := bytes.NewBufferString("")
+	err = pem.Encode(privateKeyBuf, block)
 	if err != nil {
-		return err
+		return
 	}
 
-	publicKey := &privateKey.PublicKey
-	derPkix, err := x509.MarshalPKIXPublicKey(publicKey)
+	pubKey := &priKey.PublicKey
+	derPkix, err := x509.MarshalPKIXPublicKey(pubKey)
 	if err != nil {
-		return err
+		return
 	}
 	block = &pem.Block{
 		Type:  "PUBLIC KEY",
 		Bytes: derPkix,
 	}
-	err = pem.Encode(publicKeyWriter, block)
+	publicKeyBuf := bytes.NewBufferString("")
+	err = pem.Encode(publicKeyBuf, block)
 	if err != nil {
-		return err
+		return
 	}
 
-	return nil
+	return publicKeyBuf.String(), privateKeyBuf.String(), nil
 }
 
-func NewXRsa(publicKey []byte, privateKey []byte) (*XRsa, error) {
-	block, _ := pem.Decode(publicKey)
+func NewXRsa(publicKey string, privateKey string) (*XRsa, error) {
+	block, _ := pem.Decode([]byte(publicKey))
 	if block == nil {
 		return nil, errors.New("public key error")
 	}
@@ -68,7 +70,7 @@ func NewXRsa(publicKey []byte, privateKey []byte) (*XRsa, error) {
 	}
 	pub := pubInterface.(*rsa.PublicKey)
 
-	block, _ = pem.Decode(privateKey)
+	block, _ = pem.Decode([]byte(privateKey))
 	if block == nil {
 		return nil, errors.New("private key error")
 	}

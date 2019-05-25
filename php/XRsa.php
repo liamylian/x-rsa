@@ -2,6 +2,28 @@
 
 namespace XRsa;
 
+/**
+ *
+ * Base64 for URL parameters/filenames, that adhere to RFC 4648.
+ * Defaults to dropping the padding on encode since it's not required for decoding, and keeps the URL free of % encodings.
+ */
+if (!function_exists('base64url_encode')) {
+    function base64url_encode($data, $pad = null)
+    {
+        $data = str_replace(array('+', '/'), array('-', '_'), base64_encode($data));
+        if (!$pad) {
+            $data = rtrim($data, '=');
+        }
+        return $data;
+    }
+}
+if (!function_exists('base64url_decode')) {
+    function base64url_decode($data)
+    {
+        return base64_decode(str_replace(array('-', '_'), array('+', '/'), $data));
+    }
+}
+
 class XRsa
 {
     const RSA_ALGORITHM_SIGN = OPENSSL_ALGO_SHA256;
@@ -11,7 +33,7 @@ class XRsa
     private $private_key;
     private $key_len;
 
-    public function __construct($pub_key, $pri_key = null)
+    public function __construct(string $pub_key, string $pri_key)
     {
         $this->public_key = $pub_key;
         $this->private_key = $pri_key;
@@ -20,7 +42,7 @@ class XRsa
         $this->key_len = openssl_pkey_get_details($pub_id)['bits'];
     }
 
-    public static function createKeys($key_size = 2048)
+    public static function createKeys(int $key_size = 2048): array
     {
         $config = array(
             "private_key_bits" => $key_size,
@@ -31,13 +53,10 @@ class XRsa
         $public_key_detail = openssl_pkey_get_details($res);
         $public_key = $public_key_detail["key"];
 
-        return [
-            "public_key" => $public_key,
-            "private_key" => $private_key,
-        ];
+        return [$public_key, $private_key];
     }
 
-    public function publicEncrypt($data)
+    public function publicEncrypt(string $data): string
     {
         // The message must be no longer than the
         // length of the public modulus minus 11 bytes (taken by padding).
@@ -51,14 +70,14 @@ class XRsa
             $encrypted .= $encrypted_temp;
         }
 
-        return url_safe_base64_encode($encrypted);
+        return base64url_encode($encrypted);
     }
 
-    public function privateDecrypt($encrypted)
+    public function privateDecrypt(string $encrypted): string
     {
         $decrypted = "";
         $part_len = $this->key_len / 8;
-        $base64_decoded = url_safe_base64_decode($encrypted);
+        $base64_decoded = base64url_decode($encrypted);
         $parts = str_split($base64_decoded, $part_len);
 
         foreach ($parts as $part) {
@@ -69,7 +88,7 @@ class XRsa
         return $decrypted;
     }
 
-    public function privateEncrypt($data)
+    public function privateEncrypt(string $data): string
     {
         // The message must be no longer than the
         // length of the public modulus minus 11 bytes (taken by padding).
@@ -83,14 +102,14 @@ class XRsa
             $encrypted .= $encrypted_temp;
         }
 
-        return url_safe_base64_encode($encrypted);
+        return base64url_encode($encrypted);
     }
 
-    public function publicDecrypt($encrypted)
+    public function publicDecrypt(string $encrypted): string
     {
         $decrypted = "";
         $part_len = $this->key_len / 8;
-        $base64_decoded = url_safe_base64_decode($encrypted);
+        $base64_decoded = base64url_decode($encrypted);
         $parts = str_split($base64_decoded, $part_len);
 
         foreach ($parts as $part) {
@@ -101,17 +120,17 @@ class XRsa
         return $decrypted;
     }
 
-    public function sign($data)
+    public function sign(string $data): string
     {
         openssl_sign($data, $sign, $this->private_key, self::RSA_ALGORITHM_SIGN);
 
-        return url_safe_base64_encode($sign);
+        return base64url_encode($sign);
     }
 
-    public function verify($data, $sign)
+    public function verify(string $data, string $sign): bool
     {
         $pub_id = openssl_get_publickey($this->public_key);
-        $res = openssl_verify($data, url_safe_base64_decode($sign), $pub_id, self::RSA_ALGORITHM_SIGN);
+        $res = openssl_verify($data, base64url_decode($sign), $pub_id, self::RSA_ALGORITHM_SIGN);
 
         return $res;
     }

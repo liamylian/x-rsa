@@ -1,19 +1,19 @@
 package xrsa
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"testing"
 )
 
-var publicKey = bytes.NewBufferString("")
-var privateKey = bytes.NewBufferString("")
+var publicKey string
+var privateKey string
 var xrsa *XRsa
 
 func TestCreateKeys(t *testing.T) {
-	err := CreateKeys(publicKey, privateKey, 2048)
+	var err error
+	publicKey, privateKey, err = CreateKeys(2048)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -21,7 +21,7 @@ func TestCreateKeys(t *testing.T) {
 
 func TestNewXRsa(t *testing.T) {
 	var err error
-	xrsa, err = NewXRsa(publicKey.Bytes(), privateKey.Bytes())
+	xrsa, err = NewXRsa(publicKey, privateKey)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -93,7 +93,7 @@ func TestCrossLanguage(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	rsa2, err := NewXRsa(pubKey, priKey)
+	rsa2, err := NewXRsa(string(pubKey), string(priKey))
 	if err != nil {
 		t.Fatal(err.Error())
 	}

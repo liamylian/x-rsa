@@ -8,8 +8,8 @@ class XRsaTest extends TestCase
     public function test_create_keys()
     {
         $keys = XRsa::createKeys(2048);
-        $this->assertNotNull($keys['public_key']);
-        $this->assertNotNull($keys['private_key']);
+        $this->assertNotNull($keys[0]);
+        $this->assertNotNull($keys[1]);
 
         return $keys;
     }
@@ -20,7 +20,7 @@ class XRsaTest extends TestCase
      */
     public function test_public_encrypt_private_decrypt($keys)
     {
-        $rsa = new XRsa($keys['public_key'], $keys['private_key']);
+        $rsa = new XRsa($keys[0], $keys[1]);
         $data = "Hello, World";
         $encrypted = $rsa->publicEncrypt($data);
         $decrypted = $rsa->privateDecrypt($encrypted);
@@ -34,7 +34,7 @@ class XRsaTest extends TestCase
      */
     public function test_private_encrypt_public_decrypt($keys)
     {
-        $rsa = new XRsa($keys['public_key'], $keys['private_key']);
+        $rsa = new XRsa($keys[0], $keys[1]);
         $data = "Hello, World";
         $encrypted = $rsa->privateEncrypt($data);
         $decrypted = $rsa->publicDecrypt($encrypted);
@@ -48,7 +48,7 @@ class XRsaTest extends TestCase
      */
     public function test_sign($keys)
     {
-        $rsa = new XRsa($keys['public_key'], $keys['private_key']);
+        $rsa = new XRsa($keys[0], $keys[1]);
         $data = "Hello, World";
         $sign = $rsa->sign($data);
         $is_valid = $rsa->verify($data, $sign);
