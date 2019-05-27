@@ -4,3 +4,4 @@ venv/
 *.lock
 *.cache
 __pycache__/
+target/

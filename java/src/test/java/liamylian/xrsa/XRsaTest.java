@@ -1,3 +1,5 @@
+package liamylian.xrsa;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.BufferedReader;
@@ -5,7 +7,7 @@ import java.util.Map;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.mortbay.util.ajax.JSON;
+import com.alibaba.fastjson.JSON;
 
 public class XRsaTest extends TestCase {
     public XRsaTest(String testName) {
