@@ -1,5 +1,6 @@
-import rsa
 import base64
+
+import rsa
 
 RSA_SIGN_METHOD = 'SHA-256'
 

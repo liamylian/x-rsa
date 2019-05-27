@@ -3,3 +3,4 @@ vendor/
 venv/
 *.lock
 *.cache
+__pycache__/

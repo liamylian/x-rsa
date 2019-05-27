@@ -1,5 +1,5 @@
 import unittest
-from python import xrsa
+import xrsa
 
 
 class TestXrsa(unittest.TestCase):
