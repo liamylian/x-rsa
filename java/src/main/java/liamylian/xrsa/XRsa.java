@@ -3,6 +3,8 @@ package liamylian.xrsa;
 import javax.crypto.Cipher;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.interfaces.RSAPublicKey;
 import java.security.interfaces.RSAPrivateKey;
@@ -16,7 +18,7 @@ import java.util.Base64;
 public class XRsa {
     private static final Base64.Encoder urlSafeBase64Encoder = Base64.getUrlEncoder();
     private static final Base64.Decoder urlSafeBase64Decoder = Base64.getUrlDecoder();
-    private static final String CHARSET = "UTF-8";
+    private static final Charset CHARSET = StandardCharsets.UTF_8;
     private static final String RSA_ALGORITHM = "RSA";
     private static final String RSA_ALGORITHM_SIGN = "SHA256WithRSA";
 
@@ -26,8 +28,8 @@ public class XRsa {
     public XRsa(String publicKey, String privateKey) {
         try {
             KeyFactory keyFactory = KeyFactory.getInstance(RSA_ALGORITHM);
-            X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(urlSafeBase64Decoder.decode(publicKey));
-            PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(urlSafeBase64Decoder.decode(privateKey));
+            X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(urlSafeBase64Decoder.decode(publicKey.getBytes(CHARSET)));
+            PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(urlSafeBase64Decoder.decode(privateKey.getBytes(CHARSET)));
 
             this.publicKey = (RSAPublicKey) keyFactory.generatePublic(x509KeySpec);
             this.privateKey = (RSAPrivateKey) keyFactory.generatePrivate(pkcs8KeySpec);

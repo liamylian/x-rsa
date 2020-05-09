@@ -3,5 +3,6 @@ vendor/
 venv/
 *.lock
 *.cache
+*.iml
 __pycache__/
 target/

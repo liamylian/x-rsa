@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.util.Map;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -48,10 +49,10 @@ public class XRsaTest extends TestCase {
         assertTrue(isValid);
     }
 
-    public void testCrossPlatform() {
-        File pubFile = new File("pub.base64cert");
-        File priFile = new File("pri.base64cert");
-        File testFile = new File("data.json");
+    public void testCrossPlatform() throws Exception {
+        File pubFile = new File("test/pub.base64cert");
+        File priFile = new File("test/pri.base64cert");
+        File testFile = new File("test/data.json");
         String pubKey = readFile(pubFile);
         String priKey = readFile(priFile);
         String dataStr = readFile(testFile);
@@ -72,9 +73,14 @@ public class XRsaTest extends TestCase {
         StringBuilder result = new StringBuilder();
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
-            String s;
-            while ((s = br.readLine()) != null) {
-                result.append(System.lineSeparator() + s);
+
+            String s = br.readLine();
+            while (s != null) {
+                result.append(s);
+                s = br.readLine();
+                if (s != null) {
+                    result.append(System.lineSeparator());
+                }
             }
             br.close();
         } catch (Exception e) {
