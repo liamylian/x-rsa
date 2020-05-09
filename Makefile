@@ -3,7 +3,6 @@ test_go:
 
 init_php:
 	cd php && composer install
-
 test_php:
 	cd php && ./vendor/bin/phpunit  XRsaTest.php
 
@@ -14,7 +13,6 @@ init_python:
 		. ./venv/bin/activate; \
 		pip3 install -r requirements.txt; \
 	)
-
 test_python:
 	( \
 		cd python; \
@@ -22,4 +20,7 @@ test_python:
 		python3 -m unittest xrsa_test.py; \
 	)
 
+init_java:
+	cd java && mvn install
 test_java:
+	cd java && mvn test

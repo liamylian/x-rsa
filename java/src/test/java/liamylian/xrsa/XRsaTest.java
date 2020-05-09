@@ -50,9 +50,9 @@ public class XRsaTest extends TestCase {
     }
 
     public void testCrossPlatform() throws Exception {
-        File pubFile = new File("test/pub.base64cert");
-        File priFile = new File("test/pri.base64cert");
-        File testFile = new File("test/data.json");
+        File pubFile = new File("../test/pub.base64cert");
+        File priFile = new File("../test/pri.base64cert");
+        File testFile = new File("../test/data.json");
         String pubKey = readFile(pubFile);
         String priKey = readFile(priFile);
         String dataStr = readFile(testFile);
