@@ -1,8 +1,8 @@
 # XRSA
 
-OpenSSL RSA Encryption, Decryption, and Key Generation. 
+OpenSSL RSA Encryption, Decryption, and Key Generation.
 
-- JAVA, PHP, GoLang, Python, Javascript Support
+- C, GoLang, JAVA, Javascript, PHP, Python, Rust Support
 - Large Data Support
 
 **Features:**
@@ -11,7 +11,6 @@ OpenSSL RSA Encryption, Decryption, and Key Generation.
 - RSA Padding: `PKCS#1`
 - RSA Sign Method: `SHA256`
 - Chunk Encoding: `URL Safe Base64`
-
 
 **Encryption Procedure:**
 
@@ -29,23 +28,32 @@ OpenSSL RSA Encryption, Decryption, and Key Generation.
 
 ## Installation
 
-### Php
+### C
 
-*Make sure `openssl` extension is enabled*.
-Just copy `php/XRsa.php` to your project. 
-
+```shell
+apt install libssl-dev
+```
 
 ### GoLang
 
 *Make sure your golang version is greater than `1.10.3`*.
 Just Copy `golang/rsa.go` and `golang/xrsa.go` to your project.
 
-
 ### Java
 
 *Make sure your JAVA version is greater than `JAVA 8`*.
 Just Copy `XRsa.java` to your project.
 
+### Javascript
+
+### Php
+
+*Make sure `openssl` extension is enabled*.
+Just copy `php/XRsa.php` to your project.
+
+### Python
+
+### Rust
 
 ## Usage
 
@@ -66,21 +74,21 @@ Just Copy `XRsa.java` to your project.
 
 ```go
     publicKey, privateKey, err := CreateKeys(publicKey, privateKey, 2048)
-    if err != nil {
-        return err
-    }
-    xrsa, err := NewXRsa(publicKey, privateKey)
-    if err != nil {
-        return err
-    }
+if err != nil {
+return err
+}
+xrsa, err := NewXRsa(publicKey, privateKey)
+if err != nil {
+return err
+}
 
-    data := "Hello, RSA"
-    encrypted, _ := xrsa.PublicEncrypt(data)
-    decrypted, _ := xrsa.PrivateDecrypt(encrypted) 
-    sign, err := xrsa.Sign(data)
-    err = xrsa.Verify(data, sign)
+data := "Hello, RSA"
+encrypted, _ := xrsa.PublicEncrypt(data)
+decrypted, _ := xrsa.PrivateDecrypt(encrypted)
+sign, err := xrsa.Sign(data)
+err = xrsa.Verify(data, sign)
 ```
-    
+
 ### Java
 
 ```java
